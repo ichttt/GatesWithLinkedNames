@@ -23,10 +23,10 @@ import logicsim.TextLabel;
 import javax.swing.*;
 import java.util.List;
 
-@Mod(modid = GateNameLink.MODID, modName = "Gate Name Linkage", version = "1.0.0")
+@Mod(modid = GateNameLink.MODID, modName = "Gate Name Linkage", version = "1.0.1", author = "Tobias Hotz")
 public class GateNameLink {
     public static final String MODID = "GateNameLink";
-    private static boolean show;
+    private static BooleanConfigEntry show;
     private static Config config;
     private static ConfigCategory general;
 
@@ -41,8 +41,9 @@ public class GateNameLink {
         Preconditions.checkNotNull(myModContainer);
         event.registerSaveHandler(myModContainer.mod, GateSaveHandler.INSTANCE);
         event.registerModGui(myModContainer.mod, GuiListEntry.INSTANCE);
-        if (!LogicSimModLoader.LSML_VERSION.isMinimum(new VersionBase(0,0,3)))
-            throw new MissingDependencyException(myModContainer.mod, "LogicSimModLoader", new VersionBase(0,1,1));
+        if (!LogicSimModLoader.LSML_VERSION.isMinimum(new VersionBase(0,1,2)))
+            throw new MissingDependencyException(myModContainer.mod, "LogicSimModLoader", new VersionBase(0,1,2));
+
     }
 
     @Subscribe
@@ -51,21 +52,20 @@ public class GateNameLink {
         Preconditions.checkNotNull(myModContainer);
         config = new Config(myModContainer);
         general = new ConfigCategory("GENERAL");
-        general.addEntry(new BooleanConfigEntry("showOnGateCreate", true, "Determines if a label should be giving if you create a new Gate"));
+        show = new BooleanConfigEntry("showOnGateCreate", true, "Determines if a label should be giving if you create a new Gate");
+        general.addEntry(show);
         config.addCategory(general);
         config.load();
         config.save();
-        show = ((BooleanConfigEntry) general.getConfigEntry("showOnGateCreate")).value;
     }
 
     public static void setShow(boolean value) {
-        show = value;
-        ((BooleanConfigEntry) general.getConfigEntry("showOnGateCreate")).value = value;
+        show.value = value;
         config.save();
     }
 
     public static boolean getShow() {
-        return show;
+        return show.value;
     }
 
 
@@ -76,7 +76,7 @@ public class GateNameLink {
 
     @Subscribe
     public void onGateCreate(GateEvent.GateConstructionEvent event) {
-        if (!show || event.gate instanceof TextLabel)
+        if (!show.value || event.gate instanceof TextLabel)
             return;
         spawnNewTextField(event.gate);
     }
