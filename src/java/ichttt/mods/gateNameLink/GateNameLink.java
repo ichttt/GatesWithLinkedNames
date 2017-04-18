@@ -64,7 +64,7 @@ public class GateNameLink {
         } catch (Exception e) {
             logger.log(Level.WARNING, "Could not register UpdateChecker", e);
         }
-        VersionBase required_LSML = new VersionBase(0, 1, 5);
+        VersionBase required_LSML = new VersionBase(0, 2, 0);
         if (!LogicSimModLoader.LSML_VERSION.isMinimum(required_LSML))
             throw new MissingDependencyException(myModContainer.mod, "LogicSimModLoader", required_LSML);
 
