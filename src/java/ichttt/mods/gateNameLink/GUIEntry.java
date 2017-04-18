@@ -13,9 +13,11 @@ import java.util.List;
 public class GUIEntry implements ActionListener {
     public static final GUIEntry INSTANCE = new GUIEntry();
     private JMenuItem bar;
+
     private GUIEntry() {
-        bar = new JMenuItem("Add a linked TextLabel");
+        bar = new JMenuItem(GateNameLink.translate("addLabel"));
     }
+
     public void init() {
         bar.addActionListener(this);
         MenuBarHandler.mods.add(bar);
@@ -28,7 +30,7 @@ public class GUIEntry implements ActionListener {
         for (Gate g : gates) {
             if (g.active) {
                 if (ConnectionList.hasGate(g)) {
-                    LSMLUtil.showMessageDialogOnWindowIfAvailable("Gate has already a Label!");
+                    LSMLUtil.showMessageDialogOnWindowIfAvailable(GateNameLink.translate("hasAlreadyLabel"));
                     return;
                 }
                 GateNameLink.spawnNewTextField(g);

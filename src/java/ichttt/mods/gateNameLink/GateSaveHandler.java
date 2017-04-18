@@ -1,9 +1,8 @@
 package ichttt.mods.gateNameLink;
 
 import ichttt.logicsimModLoader.api.ISaveHandler;
-import ichttt.logicsimModLoader.internal.LSMLLog;
 
-import java.io.*;
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +17,7 @@ public class GateSaveHandler implements ISaveHandler {
     public static final String SAVE_VER = "ver1"; //Don't forget to bump if you change anything regarding the save format
 
     @Override
+    @Nonnull
     public List<String> saveLines() {
         return ConnectionList.genLines();
     }
@@ -25,11 +25,11 @@ public class GateSaveHandler implements ISaveHandler {
     @Override
     public void loadLines(List<String> list) {
         if (list.isEmpty()) {
-            LSMLLog.warning("Save list is empty!");
+            GateNameLink.getLogger().warning("Save list is empty!");
             return;
         }
         if (!list.get(0).equals(SAVE_VER)) {
-            LSMLLog.warning("Non matching save version!");
+            GateNameLink.getLogger().warning("Non matching save version!");
         }
         list.remove(0);
         ConnectionList.readLines(list);

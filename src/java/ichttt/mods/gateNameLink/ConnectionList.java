@@ -1,7 +1,6 @@
 package ichttt.mods.gateNameLink;
 
 import ichttt.logicsimModLoader.init.LogicSimModLoader;
-import ichttt.logicsimModLoader.internal.LSMLLog;
 import logicsim.Gate;
 import logicsim.TextLabel;
 
@@ -13,6 +12,7 @@ import java.util.Map;
 
 public class ConnectionList {
     private static Map<Gate, TextLabel> textLabelHashMap = new HashMap<>();
+    private static Map<Gate, GatePosCache> cacheMap = new HashMap<>();
 
 
     public static boolean hasGate(Gate gate) {
@@ -20,23 +20,27 @@ public class ConnectionList {
                 anyMatch(gate::equals);
     }
 
-    public static TextLabel getTextLabel(Gate gate) {
-        Gate uniqueGate = textLabelHashMap.keySet().stream().
-                filter(gate::equals).
-                findAny().
-                orElse(null);
-        if (uniqueGate == null) {
-            return null;
+    public static boolean hasGateChanged(Gate gate) {
+        GatePosCache cache = cacheMap.get(gate);
+        if (cache == null) {
+            GateNameLink.getLogger().severe("Could not find cache for gate, creating new one!");
+            cacheMap.put(gate, new GatePosCache(gate));
         }
-        return textLabelHashMap.get(uniqueGate);
+        return cacheMap.get(gate).hasChanged();
+    }
+
+    public static TextLabel getTextLabel(Gate gate) {
+        return textLabelHashMap.get(gate);
     }
 
     public static void addToMap(Gate gate, TextLabel label) {
         textLabelHashMap.put(gate, label);
+        cacheMap.put(gate, new GatePosCache(gate));
     }
 
     public static void removeFromMap(Gate gate) {
         textLabelHashMap.remove(gate);
+        cacheMap.remove(gate);
     }
 
     public static List<String> genLines() {
@@ -55,7 +59,7 @@ public class ConnectionList {
         Map<Gate, TextLabel> map = new HashMap<>();
         List<Gate> loadedGates = LogicSimModLoader.getApp().lsframe.lspanel.gates.gates;
         Gate currentGate = null;
-        TextLabel currentTextLabel = null;
+        TextLabel currentTextLabel;
         textLabelHashMap.clear();
 
         for (String line : lines) {
@@ -68,24 +72,24 @@ public class ConnectionList {
             int y = Integer.parseInt(split[1]);
             if (line.startsWith(GateSaveHandler.GATE_IDENTIFIER)) {
                 if (!expectGate) {
-                    LSMLLog.warning("Could not load save data. Reason: Got Gate while awaiting TextLabel");
+                    GateNameLink.getLogger().warning("Could not load save data. Reason: Got Gate while awaiting TextLabel");
                     return;
                 }
                 currentGate = getGate(loadedGates, x, y);
                 if (currentGate == null) {
-                    LSMLLog.warning("Could not find Gate with posx %s and posy %s!", x, y);
+                    GateNameLink.getLogger().warning(String.format("Could not find Gate with posx %s and posy %s!", x, y));
                     skipNext = true;
                     continue;
                 }
                 expectGate = false;
             } else if (line.startsWith(GateSaveHandler.TEXT_IDENTIFIER)) {
                 if (expectGate) {
-                    LSMLLog.warning("Could not load save data. Reason: Got TextLabel while awaiting Gate");
+                    GateNameLink.getLogger().warning("Could not load save data. Reason: Got TextLabel while awaiting Gate");
                     return;
                 }
                 currentTextLabel = getTextLabel(loadedGates, x, y, split[2]);
                 if (currentTextLabel == null) {
-                    LSMLLog.warning("Could not find TextLabel with posx %s and posy %s and text %s!", x, y, split[2]);
+                    GateNameLink.getLogger().warning(String.format("Could not find TextLabel with posx %s and posy %s and text %s!", x, y, split[2]));
                     continue;
                 }
                 map.put(currentGate, currentTextLabel);
@@ -93,27 +97,25 @@ public class ConnectionList {
             }
         }
         textLabelHashMap = map;
+        //rebuild cache
+        cacheMap.clear();
+        textLabelHashMap.keySet().forEach(gate -> cacheMap.put(gate, new GatePosCache(gate)));
     }
 
     @Nullable
     private static Gate getGate(List<Gate> loadedGates, int posx, int posy) {
-        for (Gate gate : loadedGates) {
-            if (gate.x == posx && gate.y == posy) {
-                return gate;
-            }
-        }
-        return null;
+        return loadedGates.stream().
+                filter(gate -> gate.x == posx && gate.y == posy).
+                findAny().
+                orElse(null);
     }
 
     @Nullable
     private static TextLabel getTextLabel(List<Gate> loadedGates, int posx, int posy, String text) {
-        for (Gate gate : loadedGates) {
-            if (gate instanceof TextLabel) {
-                if (((TextLabel) gate).text.equals(text) && gate.x == posx && gate.y == posy) {
-                    return (TextLabel) gate;
-                }
-            }
-        }
-        return null;
+        return (TextLabel) loadedGates.stream().
+                filter(gate -> gate instanceof TextLabel).
+                filter(gate -> ((TextLabel) gate).text.equals(text) && gate.x == posx && gate.y == posy).
+                findAny().
+                orElse(null);
     }
 }
