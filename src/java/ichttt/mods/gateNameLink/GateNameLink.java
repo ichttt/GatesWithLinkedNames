@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Mod(modid = GateNameLink.MODID, modName = "Gates with linked names", version = "1.1.0", author = "Tobias Hotz")
+@Mod(modid = GateNameLink.MODID, modName = "Gates with linked names", version = "1.1.1", author = "Tobias Hotz")
 public class GateNameLink {
 
     public static final String MODID = "GateNameLink";
@@ -64,9 +64,8 @@ public class GateNameLink {
         try {
             event.checkForUpdate(new UpdateContext(myModContainer, new URL("https://raw.githubusercontent.com/ichttt/GatesWithLinkedNames/master/updateinfo.txt")).
                     withWebsite(new URL("https://github.com/ichttt/GatesWithLinkedNames")).
-                    enableAutoUpdate(new URL(""), new URL(""))
-
-            );
+                    enableAutoUpdate(new URL("https://github.com/ichttt/GatesWithLinkedNames/blob/master/GateList.jar?raw=true"),
+                            new URL("https://github.com/ichttt/GatesWithLinkedNames/blob/master/GateList.modinfo")));
         } catch (Exception e) {
             logger.log(Level.WARNING, "Could not register UpdateChecker", e);
         }
@@ -168,7 +167,7 @@ public class GateNameLink {
         relink(source, label);
         app.lsframe.lspanel.gates.addGate(label);
         ConnectionList.addToMap(source, label);
-//        app.frame.repaint();
+        app.frame.repaint();
     }
 
     public static void relink(Gate gate, TextLabel label) {

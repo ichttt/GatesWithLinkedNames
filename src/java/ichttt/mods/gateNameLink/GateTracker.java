@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import ichttt.logicsimModLoader.event.GateEvent;
 import ichttt.logicsimModLoader.event.GlobalDrawEvent;
 import ichttt.logicsimModLoader.init.LogicSimModLoader;
+import jdk.internal.org.objectweb.asm.tree.LookupSwitchInsnNode;
 import logicsim.Gate;
 import logicsim.GateList;
 import logicsim.TextLabel;
@@ -41,7 +42,7 @@ public class GateTracker {
                 Graphics graphics = event.graphics;
                 if (ConnectionList.hasGateChanged(gate)) {
                     GateNameLink.relink(gate, label);
-                    label.draw(graphics);
+                    LogicSimModLoader.getApp().lsframe.repaint();
                 }
                 Color current = graphics.getColor();
                 graphics.setColor(new Color(0x159B00));
