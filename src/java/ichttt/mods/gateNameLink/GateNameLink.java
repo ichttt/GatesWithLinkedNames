@@ -18,6 +18,7 @@ import ichttt.logicsimModLoader.init.LogicSimModLoader;
 import ichttt.logicsimModLoader.internal.LSMLLog;
 import ichttt.logicsimModLoader.internal.ModContainer;
 import ichttt.logicsimModLoader.loader.Loader;
+import ichttt.logicsimModLoader.update.UpdateContext;
 import ichttt.logicsimModLoader.util.I18nHelper;
 import logicsim.App;
 import logicsim.Gate;
@@ -55,16 +56,21 @@ public class GateNameLink {
 
     @Subscribe
     public void onRegistration(LSMLRegistrationEvent event) {
+        logger = LSMLLog.getCustomLogger(MODID);
         ModContainer myModContainer = Loader.getInstance().getModContainerForModID(MODID);
         Preconditions.checkNotNull(myModContainer);
         event.registerSaveHandler(myModContainer.mod, GateSaveHandler.INSTANCE);
         event.registerModGui(myModContainer.mod, ModPanelEntry.INSTANCE);
         try {
-            event.checkForUpdate(myModContainer, new URL("https://raw.githubusercontent.com/ichttt/GatesWithLinkedNames/master/updateinfo.txt"));
+            event.checkForUpdate(new UpdateContext(myModContainer, new URL("https://raw.githubusercontent.com/ichttt/GatesWithLinkedNames/master/updateinfo.txt")).
+                    withWebsite(new URL("https://github.com/ichttt/GatesWithLinkedNames")).
+                    enableAutoUpdate(new URL(""), new URL(""))
+
+            );
         } catch (Exception e) {
             logger.log(Level.WARNING, "Could not register UpdateChecker", e);
         }
-        VersionBase required_LSML = new VersionBase(0, 2, 0);
+        VersionBase required_LSML = new VersionBase(0, 2, 2);
         if (!LogicSimModLoader.LSML_VERSION.isMinimum(required_LSML))
             throw new MissingDependencyException(myModContainer.mod, "LogicSimModLoader", required_LSML);
 
@@ -74,7 +80,6 @@ public class GateNameLink {
     public void onPreInit(LSMLPreInitEvent event) {
         ModContainer myModContainer = Loader.getInstance().getModContainerForModID(MODID);
         Preconditions.checkNotNull(myModContainer);
-        logger = LSMLLog.getCustomLogger(MODID);
         i18n = new I18nHelper(MODID);
 
         //Setup config
