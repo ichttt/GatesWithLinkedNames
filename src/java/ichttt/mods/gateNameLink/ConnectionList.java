@@ -20,6 +20,16 @@ public class ConnectionList {
                 anyMatch(gate::equals);
     }
 
+    public static void removeTextLabelIfPresent(TextLabel label) {
+        ArrayList<Gate> gates = new ArrayList<>();
+        textLabelHashMap.forEach((key, value) -> {
+            if (value.equals(label)) gates.add(key);
+        });
+        for (Gate g : gates) {
+            textLabelHashMap.remove(g);
+        }
+    }
+
     public static boolean hasGateChanged(Gate gate) {
         GatePosCache cache = cacheMap.get(gate);
         if (cache == null) {

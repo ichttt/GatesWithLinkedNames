@@ -54,6 +54,8 @@ public class GateTracker {
 
     @Subscribe
     public void onGateDelete(GateEvent.GateDeleteEvent event) {
+        if (event.gate instanceof TextLabel)
+            ConnectionList.removeTextLabelIfPresent((TextLabel) event.gate);
         if (ConnectionList.hasGate(event.gate)) {
             List<Gate> gates = LogicSimModLoader.getApp().lsframe.lspanel.gates.gates;
             TextLabel toRemove = ConnectionList.getTextLabel(event.gate);
