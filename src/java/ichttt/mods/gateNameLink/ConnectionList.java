@@ -9,10 +9,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 public class ConnectionList {
     private static Map<Gate, TextLabel> textLabelHashMap = new HashMap<>();
-    private static Map<Gate, GatePosCache> cacheMap = new HashMap<>();
+    private static Map<Gate, GatePosCache> cacheMap = new WeakHashMap<>();
 
 
     public static boolean hasGate(Gate gate) {
@@ -25,17 +26,12 @@ public class ConnectionList {
         textLabelHashMap.forEach((key, value) -> {
             if (value.equals(label)) gates.add(key);
         });
-        for (Gate g : gates) {
-            textLabelHashMap.remove(g);
-        }
+        for (Gate g : gates)
+            removeFromMap(g);
     }
 
     public static boolean hasGateChanged(Gate gate) {
-        GatePosCache cache = cacheMap.get(gate);
-        if (cache == null) {
-            GateNameLink.getLogger().severe("Could not find cache for gate, creating new one!");
-            cacheMap.put(gate, new GatePosCache(gate));
-        }
+        cacheMap.computeIfAbsent(gate, GatePosCache::new);
         return cacheMap.get(gate).hasChanged();
     }
 
@@ -44,6 +40,7 @@ public class ConnectionList {
     }
 
     public static void addToMap(Gate gate, TextLabel label) {
+        label.deactivate();
         textLabelHashMap.put(gate, label);
         cacheMap.put(gate, new GatePosCache(gate));
     }
