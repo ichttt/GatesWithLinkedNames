@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Mod(modid = GateNameLink.MODID, modName = "Gates with linked names", version = "1.1.2", author = "Tobias Hotz")
+@Mod(modid = GateNameLink.MODID, modName = "Gates with linked names", version = "1.1.3", author = "Tobias Hotz")
 public class GateNameLink {
 
     public static final String MODID = "GateNameLink";
@@ -65,7 +65,7 @@ public class GateNameLink {
             event.checkForUpdate(new UpdateContext(myModContainer, new URL("https://raw.githubusercontent.com/ichttt/GatesWithLinkedNames/master/updateinfo.txt")).
                     withWebsite(new URL("https://github.com/ichttt/GatesWithLinkedNames")).
                     enableAutoUpdate(new URL("https://github.com/ichttt/GatesWithLinkedNames/blob/master/GateList.jar?raw=true"),
-                            new URL("https://github.com/ichttt/GatesWithLinkedNames/blob/master/GateList.modinfo")));
+                            new URL("https://raw.githubusercontent.com/ichttt/GatesWithLinkedNames/master/GateList.modinfo")));
         } catch (Exception e) {
             logger.log(Level.WARNING, "Could not register UpdateChecker", e);
         }
