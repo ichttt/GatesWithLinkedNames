@@ -16,22 +16,27 @@ public class ConnectionList {
     private static Map<Gate, GatePosCache> cacheMap = new WeakHashMap<>();
 
 
-    public static boolean hasGate(Gate gate) {
-        return textLabelHashMap.keySet().stream().
-                anyMatch(gate::equals);
+    public static boolean hasGate(Gate target) {
+        for (Gate g : textLabelHashMap.keySet()) {
+            if (g.equals(target))
+                return true;
+        }
+        return false;
     }
 
     public static void removeTextLabelIfPresent(TextLabel label) {
         ArrayList<Gate> gates = new ArrayList<>();
-        textLabelHashMap.forEach((key, value) -> {
-            if (value.equals(label)) gates.add(key);
-        });
+        for (Map.Entry<Gate, TextLabel> entry : textLabelHashMap.entrySet()) {
+            if (entry.getValue().equals(label))
+                gates.add(entry.getKey());
+        }
         for (Gate g : gates)
             removeFromMap(g);
     }
 
     public static boolean hasGateChanged(Gate gate) {
-        cacheMap.computeIfAbsent(gate, GatePosCache::new);
+        if (cacheMap.get(gate) == null)
+            cacheMap.put(gate, new GatePosCache(gate));
         return cacheMap.get(gate).hasChanged();
     }
 
@@ -53,10 +58,12 @@ public class ConnectionList {
     public static List<String> genLines() {
         List<String> lines = new ArrayList<>(textLabelHashMap.size()*2);
         lines.add(GateSaveHandler.SAVE_VER);
-        textLabelHashMap.forEach((gate, textLabel) -> {
+        for (Map.Entry<Gate, TextLabel> entry : textLabelHashMap.entrySet()) {
+            Gate gate = entry.getKey();
+            TextLabel textLabel = entry.getValue();
             lines.add(GateSaveHandler.GATE_IDENTIFIER + gate.x + GateSaveHandler.SPLITTER + gate.y);
             lines.add(GateSaveHandler.TEXT_IDENTIFIER + textLabel.x + GateSaveHandler.SPLITTER + textLabel.y + GateSaveHandler.SPLITTER + textLabel.text);
-        });
+        }
         return lines;
     }
 
@@ -106,23 +113,29 @@ public class ConnectionList {
         textLabelHashMap = map;
         //rebuild cache
         cacheMap.clear();
-        textLabelHashMap.keySet().forEach(gate -> cacheMap.put(gate, new GatePosCache(gate)));
+        for (Gate gate : textLabelHashMap.keySet()) {
+            cacheMap.put(gate, new GatePosCache(gate));
+        }
     }
 
     @Nullable
     private static Gate getGate(List<Gate> loadedGates, int posx, int posy) {
-        return loadedGates.stream().
-                filter(gate -> gate.x == posx && gate.y == posy).
-                findAny().
-                orElse(null);
+        for (Gate g : loadedGates) {
+            if (g.x == posx && g.y == posy)
+                return g;
+        }
+        return null;
     }
 
     @Nullable
     private static TextLabel getTextLabel(List<Gate> loadedGates, int posx, int posy, String text) {
-        return (TextLabel) loadedGates.stream().
-                filter(gate -> gate instanceof TextLabel).
-                filter(gate -> ((TextLabel) gate).text.equals(text) && gate.x == posx && gate.y == posy).
-                findAny().
-                orElse(null);
+        for (Gate g : loadedGates) {
+            if (g instanceof TextLabel) {
+                TextLabel label = (TextLabel) g;
+                if (label.text.equals(text) && label.x == posx && label.y == posy)
+                    return label;
+            }
+        }
+        return null;
     }
 }

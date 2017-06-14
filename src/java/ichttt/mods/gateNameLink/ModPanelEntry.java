@@ -28,7 +28,12 @@ public class ModPanelEntry implements ActionListener, IModGuiInterface, FocusLis
         panel.setLayout(new GridLayout(0, 1));
         checkBox = new JCheckBox(GateNameLink.translate("autoShowdesc"));
         checkBox.setSelected(GateNameLink.getShow());
-        checkBox.addActionListener(event -> GateNameLink.setShow(checkBox.isSelected()));
+        checkBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                GateNameLink.setShow(checkBox.isSelected());
+            }
+        });
         offsetX = new JTextField();
         offsetX.setActionCommand("X");
         offsetX.addActionListener(this);

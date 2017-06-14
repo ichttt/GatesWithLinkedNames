@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Mod(modid = GateNameLink.MODID, modName = "Gates with linked names", version = "1.1.3", author = "Tobias Hotz")
+@Mod(modid = GateNameLink.MODID, modName = "Gates with linked names", version = "1.1.4", author = "Tobias Hotz")
 public class GateNameLink {
 
     public static final String MODID = "GateNameLink";

@@ -1,4 +1,4 @@
 #Class with @Mod annotation
 modClass = ichttt.mods.gateNameLink.GateNameLink
 #Computed SHA of the jar
-SHA1String = 241E2E26C9A9D6314505870528F6B385BF61DD68
+SHA1String = 2766DCB03925E85E47CF20F9EFC5C52439ED31FD
